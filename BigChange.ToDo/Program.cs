@@ -1,5 +1,5 @@
 using BigChange.ToDo;
-
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,13 +27,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+const string baseUrl = "api/ToDoItems";
 
-app.MapGet("api/ToDoItems", (ToDoDbContext db) => db.ToDoItems.ToListAsync())
+app.MapGet(baseUrl, (ToDoDbContext db) => db.ToDoItems.ToListAsync())
     .WithName("GetToDoList")
     .WithOpenApi();
 
 
-app.MapGet("api/ToDoItems/{id}", async (ToDoDbContext db, long id) => {
+app.MapGet("{baseUrl}/{id}", async (ToDoDbContext db, long id) =>
+    {
         var todoItem = await db.ToDoItems.FindAsync(id);
 
         if (todoItem == null)
@@ -43,12 +45,11 @@ app.MapGet("api/ToDoItems/{id}", async (ToDoDbContext db, long id) => {
 
         return Results.Ok(todoItem);
     })
-.WithName("GetToDoItem")
+    .WithName("GetToDoItem")
     .WithOpenApi();
 
-app.MapPut("api/ToDoItems/{id}", async (ToDoDbContext db, long id, ToDoItem item) =>
+app.MapPut("{baseUrl}/{id}", async (ToDoDbContext db,[FromRoute] long id,[FromBody] ToDoItem item) =>
 {
-
     if (id != item.Id)
     {
         return Results.BadRequest();
@@ -67,11 +68,10 @@ app.MapPut("api/ToDoItems/{id}", async (ToDoDbContext db, long id, ToDoItem item
     await db.SaveChangesAsync();
 
 
-
     return Results.NoContent();
 });
 
-app.MapDelete("api/ToDoItems/{id}", async (ToDoDbContext db, long id) =>
+app.MapDelete("{baseUrl}/{id}", async (ToDoDbContext db, long id) =>
 {
     var todoItem = await db.ToDoItems.FindAsync(id);
 
@@ -82,11 +82,11 @@ app.MapDelete("api/ToDoItems/{id}", async (ToDoDbContext db, long id) =>
 
     db.ToDoItems.Remove(todoItem);
     await db.SaveChangesAsync();
-    
+
     return Results.NoContent();
 });
 
-app.MapPost("api/ToDoItems", async (ToDoItem item, ToDoDbContext db) =>
+app.MapPost(baseUrl, async ([FromBody] ToDoItem item, ToDoDbContext db) =>
     {
         db.ToDoItems.Add(item);
         await db.SaveChangesAsync();
