@@ -1,6 +1,8 @@
-@BigChange.ToDo_HostAddress = http://localhost:5069
+@BigChangeToDo_HostAddress = https://localhost:44319
 
-GET {{BigChange.ToDo_HostAddress}}/weatherforecast/
+GET {{BigChangeToDo_HostAddress}}/api/ToDoItems/
 Accept: application/json
 
 ###
+GET {{BigChangeToDo_HostAddress}}/api/ToDoItems/1
+Accept: application/json
