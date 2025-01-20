@@ -34,7 +34,7 @@ app.MapGet(baseUrl, (ToDoDbContext db) => db.ToDoItems.ToListAsync())
     .WithOpenApi();
 
 
-app.MapGet("{baseUrl}/{id}", async (ToDoDbContext db, long id) =>
+app.MapGet(baseUrl + "/{id:long}", async (ToDoDbContext db, long id) =>
     {
         var todoItem = await db.ToDoItems.FindAsync(id);
 
@@ -48,7 +48,7 @@ app.MapGet("{baseUrl}/{id}", async (ToDoDbContext db, long id) =>
     .WithName("GetToDoItem")
     .WithOpenApi();
 
-app.MapPut("{baseUrl}/{id}", async (ToDoDbContext db,[FromRoute] long id,[FromBody] ToDoItem item) =>
+app.MapPut(baseUrl + "/{id:long}", async (ToDoDbContext db,[FromRoute] long id,[FromBody] ToDoItem item) =>
 {
     if (id != item.Id)
     {
@@ -71,7 +71,7 @@ app.MapPut("{baseUrl}/{id}", async (ToDoDbContext db,[FromRoute] long id,[FromBo
     return Results.NoContent();
 });
 
-app.MapDelete("{baseUrl}/{id}", async (ToDoDbContext db, long id) =>
+app.MapDelete(baseUrl + "/{id:long}", async (ToDoDbContext db, long id) =>
 {
     var todoItem = await db.ToDoItems.FindAsync(id);
 
